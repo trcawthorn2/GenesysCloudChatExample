@@ -1,7 +1,7 @@
 import Service from '@ember/service';
 import Ember from 'ember';
 
-function _convertUrl(url, clientId){
+function _convertUrl(url, clientId) {
     return url+ `/oauth/authorize?client_id=${clientId}&response_type=token&redirect_uri=${window.location.origin}`
 }
 
@@ -14,6 +14,7 @@ export default Service.extend({
         let urlParams = new URLSearchParams(window.location.hash.substr(1));
         let token = urlParams.get('access_token');
         if (!token) {
+            console.log("#### No Token");
             urlParams = new URLSearchParams(window.location.search);
             this.get('urlStateService').storeState();
             let clientId = urlParams.get('clientId');
@@ -21,7 +22,7 @@ export default Service.extend({
             window.location = _convertUrl(regionUrl,clientId)
             
         } else {
-            console.log('TOKEN FOUND');
+            console.log(' TOKEN FOUND');
             this.authToken = token;
         }
     }

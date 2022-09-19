@@ -32,20 +32,6 @@ define('chatExample/breakpoints', ['exports'], function (exports) {
     desktop: '(min-width: 992px) and (max-width: 1200px)'
   };
 });
-define("chatExample/cldrs/en", ["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = [{ "locale": "en-US", "parentLocale": "en" }, { "locale": "en", "pluralRuleFunction": function (n, ord) {
-      var s = String(n).split("."),
-          v0 = !s[1],
-          t0 = Number(s[0]) == n,
-          n10 = t0 && s[0].slice(-1),
-          n100 = t0 && s[0].slice(-2);if (ord) return n10 == 1 && n100 != 11 ? "one" : n10 == 2 && n100 != 12 ? "two" : n10 == 3 && n100 != 13 ? "few" : "other";return n == 1 && v0 ? "one" : "other";
-    }, "fields": { "year": { "displayName": "year", "relative": { "0": "this year", "1": "next year", "-1": "last year" }, "relativeTime": { "future": { "one": "in {0} year", "other": "in {0} years" }, "past": { "one": "{0} year ago", "other": "{0} years ago" } } }, "month": { "displayName": "month", "relative": { "0": "this month", "1": "next month", "-1": "last month" }, "relativeTime": { "future": { "one": "in {0} month", "other": "in {0} months" }, "past": { "one": "{0} month ago", "other": "{0} months ago" } } }, "day": { "displayName": "day", "relative": { "0": "today", "1": "tomorrow", "-1": "yesterday" }, "relativeTime": { "future": { "one": "in {0} day", "other": "in {0} days" }, "past": { "one": "{0} day ago", "other": "{0} days ago" } } }, "hour": { "displayName": "hour", "relativeTime": { "future": { "one": "in {0} hour", "other": "in {0} hours" }, "past": { "one": "{0} hour ago", "other": "{0} hours ago" } } }, "minute": { "displayName": "minute", "relativeTime": { "future": { "one": "in {0} minute", "other": "in {0} minutes" }, "past": { "one": "{0} minute ago", "other": "{0} minutes ago" } } }, "second": { "displayName": "second", "relative": { "0": "now" }, "relativeTime": { "future": { "one": "in {0} second", "other": "in {0} seconds" }, "past": { "one": "{0} second ago", "other": "{0} seconds ago" } } } } }];
-});
 define('chatExample/components/basic-dropdown', ['exports', 'ember-basic-dropdown/components/basic-dropdown'], function (exports, _basicDropdown) {
   'use strict';
 
@@ -2086,13 +2072,14 @@ define('chatExample/services/auth-service', ['exports'], function (exports) {
             let urlParams = new URLSearchParams(window.location.hash.substr(1));
             let token = urlParams.get('access_token');
             if (!token) {
+                console.log("#### No Token");
                 urlParams = new URLSearchParams(window.location.search);
                 this.get('urlStateService').storeState();
                 let clientId = urlParams.get('clientId');
                 let regionUrl = this.get('regionLocatorService').getRegionAuthUrl(urlParams.get('region'));
                 window.location = _convertUrl(regionUrl, clientId);
             } else {
-                console.log('TOKEN FOUND');
+                console.log(' TOKEN FOUND');
                 this.authToken = token;
             }
         }
@@ -2365,14 +2352,6 @@ define("chatExample/templates/index", ["exports"], function (exports) {
   });
   exports.default = Ember.HTMLBars.template({ "id": "JUpMZrU7", "block": "{\"symbols\":[],\"statements\":[[6,\"span\"],[9,\"class\",\"title\"],[7],[0,\"Chat Overview\"],[8],[0,\"\\n\"],[1,[18,\"groups-overview\"],false]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/templates/index.hbs" } });
 });
-define("chatExample/translations/en-us", ["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = { "fixtable-ember": { "apply": "Apply", "clear": "Clear", "items_per_page": "items per page", "loading": "Loading...", "of": "of", "page": "Page" } };
-});
 define('chatExample/utils/intl/missing-message', ['exports', 'ember-intl/utils/missing-message'], function (exports, _missingMessage) {
   'use strict';
 
@@ -2408,6 +2387,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+5510e8c5"});
 }
 //# sourceMappingURL=chatExample.map
