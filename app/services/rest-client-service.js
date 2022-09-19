@@ -1,6 +1,14 @@
 import Service from '@ember/service';
 
 export default Service.extend({
+    getOptions: function(token) {
+        return {
+            headers:{
+                'Content-Type':'application/json',
+                Authorization: 'bearer '+token 
+            }
+        };
+    },
     get: function(url, options) {
         options.url = url;
         return $.ajax(options);
