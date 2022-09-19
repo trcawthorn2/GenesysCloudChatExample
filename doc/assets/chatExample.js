@@ -2258,6 +2258,14 @@ define('chatExample/services/rest-client-service', ['exports'], function (export
         value: true
     });
     exports.default = Ember.Service.extend({
+        getOptions: function (token) {
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'bearer ' + token
+                }
+            };
+        },
         get: function (url, options) {
             options.url = url;
             return $.ajax(options);
@@ -2278,6 +2286,58 @@ define('chatExample/services/rest-client-service', ['exports'], function (export
             options.url = url;
             options.method = 'PSOT';
             return $.ajax(options);
+        }
+    });
+});
+define('chatExample/services/search-service', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Service.extend({
+        store: Ember.inject.service(),
+        authService: Ember.inject.service(),
+        urlStateService: Ember.inject.service(),
+        restClientService: Ember.inject.service(),
+        regionLocatorService: Ember.inject.service(),
+        getBaseUrl: function () {
+            let state = this.get('urlStateService').cachedState();
+            let urlParams = new URLSearchParams(state);
+            return this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+        },
+        serachChatRooms: async function (term, chatRooms) {
+            if (this.get('authService').authToken) {
+                let results = [];
+                chatRooms.forEach(async room => {
+                    let searchResults = await this.searchChat(term, room);
+                    results.push({ id: room.id, results: searchResults });
+                });
+                return results;
+            }
+        },
+        searchChat: function (term, room) {
+            let restClient = this.get('restClientService');
+            let baseUrl = this.getBaseUrl();
+            let url = `${baseUrl}/api/v2/search`;
+            let data = {
+                types: ['messages'],
+                sortBy: 'created',
+                sortOrder: 'DESC',
+                expand: ['to', 'from'],
+                pageNumber: 1,
+                pageSize: 25,
+                query: [{
+                    type: 'SIMPLE',
+                    value: term,
+                    fields: ['body']
+                }, {
+                    type: 'EXACT',
+                    fields: ['targetJids'],
+                    values: [room.id]
+                }]
+            };
+            return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
         }
     });
 });
@@ -2387,6 +2447,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+5510e8c5"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+6e62bf1f"});
 }
 //# sourceMappingURL=chatExample.map
