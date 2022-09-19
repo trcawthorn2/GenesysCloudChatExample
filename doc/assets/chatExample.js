@@ -2072,13 +2072,14 @@ define('chatExample/services/auth-service', ['exports'], function (exports) {
             let urlParams = new URLSearchParams(window.location.hash.substr(1));
             let token = urlParams.get('access_token');
             if (!token) {
+                console.log("#### No Token");
                 urlParams = new URLSearchParams(window.location.search);
                 this.get('urlStateService').storeState();
                 let clientId = urlParams.get('clientId');
                 let regionUrl = this.get('regionLocatorService').getRegionAuthUrl(urlParams.get('region'));
                 window.location = _convertUrl(regionUrl, clientId);
             } else {
-                console.log('TOKEN FOUND');
+                console.log(' TOKEN FOUND');
                 this.authToken = token;
             }
         }
@@ -2386,6 +2387,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+e0a44ff5"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+5510e8c5"});
 }
 //# sourceMappingURL=chatExample.map
