@@ -3,6 +3,7 @@
 # compiled output
 /tmp
 /dist
+/doc
 
 # dependencies
 /node_modules
@@ -21,5 +22,3 @@ testem.log
 .node_modules.ember-try/
 bower.json.ember-try
 package.json.ember-try
-
-

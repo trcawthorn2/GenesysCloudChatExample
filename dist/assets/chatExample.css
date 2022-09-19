@@ -7006,7 +7006,7 @@ button.close {
   padding: 10px;
 }
 body {
-  margin: 0;
+  margin: 20px;
   background: #fdfdfd;
   height: 100vh;
   overflow: hidden;

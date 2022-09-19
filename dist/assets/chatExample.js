@@ -990,13 +990,16 @@ define('chatExample/components/groups-overview/component', ['exports'], function
     exports.default = Ember.Component.extend({
         classNames: ['groups-overview'],
         // authService: Ember.inject.service(),
-        groupService: Ember.inject.service(),
+        groupService: Ember.inject.service()
 
-        selectedGroup: Ember.computed(function () {
-            // console.log('### model', this.model);
-            // return this.get('model').find(x => x.id === model.id);
-        })
+        // selectedGroup: computed(function () {
+        // return this.get('model').find(x => x.id === model.id);
+        // }),
 
+        // icon: computed('model', function () {
+        //     console.log('### model', this.model);
+        //     return 'user';
+        // })
     });
 });
 define("chatExample/components/groups-overview/template", ["exports"], function (exports) {
@@ -2130,36 +2133,51 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
     });
     exports.default = Ember.Service.extend({
         // store: Ember.inject.service(),
-        // authService: Ember.inject.service(),
-        // urlStateService: Ember.inject.service(),
-        // restClientService: Ember.inject.service(),
-        // regionLocatorService: Ember.inject.service(),
+        authService: Ember.inject.service(),
+        urlStateService: Ember.inject.service(),
+        restClientService: Ember.inject.service(),
+        regionLocatorService: Ember.inject.service(),
 
         getGroups: function () {
-            // if(this.get('authService').authToken){
-            //     let state = this.get('urlStateService').cachedState();
-            //     let urlParams = new URLSearchParams(state);
-            //     let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
-            //     return this.get('restClientService').get(url+'/api/v2/groups?pageSize=500', {headers:{'Content-Type':'application/json', 'Authorization': 'bearer '+this.get('authService').authToken}} );
-            // }
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
 
-            return Ember.RSVP.resolve(Ember.A([{
-                groupName: "People", options: [{
-                    "id": "1",
-                    "name": "Ryan Test"
-                }, {
-                    "id": "2",
-                    "name": "Andrew Schmidt"
-                }]
-            }, {
-                groupName: "Groups", options: [{
-                    "id": "2339d855-7383-4def-b16a-c8de726aeba9",
-                    "name": "Red Stapler Society"
-                }, {
-                    "id": "b42cf716-5acf-4f41-ba08-c293c40be1c2",
-                    "name": "Aymane Group 1"
-                }]
-            }]));
+                console.log('### urlParams', urlParams);
+                console.log('### state', state);
+                console.log('### url', url);
+
+                // return this.get('restClientService').get(url+'/api/v2/groups?pageSize=500', {headers:{'Content-Type':'application/json', 'Authorization': 'bearer '+this.get('authService').authToken}} );
+            }
+
+            // return RSVP.resolve(A(
+            //     [{
+            //         groupName: "People", options: [
+            //             {
+            //                 "id": "1",
+            //                 "name": "Ryan Test"
+            //             },
+            //             {
+            //                 "id": "2",
+            //                 "name": "Andrew Schmidt"
+            //             }
+
+            //         ]
+            //     },
+            //     {
+            //         groupName: "Groups", options: [
+            //             {
+            //                 "id": "2339d855-7383-4def-b16a-c8de726aeba9",
+            //                 "name": "Red Stapler Society"
+            //             },
+            //             {
+            //                 "id": "b42cf716-5acf-4f41-ba08-c293c40be1c2",
+            //                 "name": "Aymane Group 1"
+            //             }
+            //         ]
+            //     }]
+            // ))
         }
     });
 });
@@ -2270,6 +2288,14 @@ define('chatExample/services/rest-client-service', ['exports'], function (export
         value: true
     });
     exports.default = Ember.Service.extend({
+        getOptions: function (token) {
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'bearer ' + token
+                }
+            };
+        },
         get: function (url, options) {
             options.url = url;
             return $.ajax(options);
@@ -2290,6 +2316,58 @@ define('chatExample/services/rest-client-service', ['exports'], function (export
             options.url = url;
             options.method = 'PSOT';
             return $.ajax(options);
+        }
+    });
+});
+define('chatExample/services/search-service', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Service.extend({
+        store: Ember.inject.service(),
+        authService: Ember.inject.service(),
+        urlStateService: Ember.inject.service(),
+        restClientService: Ember.inject.service(),
+        regionLocatorService: Ember.inject.service(),
+        getBaseUrl: function () {
+            let state = this.get('urlStateService').cachedState();
+            let urlParams = new URLSearchParams(state);
+            return this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+        },
+        serachChatRooms: async function (term, chatRooms) {
+            if (this.get('authService').authToken) {
+                let results = [];
+                chatRooms.forEach(async room => {
+                    let searchResults = await this.searchChat(term, room);
+                    results.push({ id: room.id, results: searchResults });
+                });
+                return results;
+            }
+        },
+        searchChat: function (term, room) {
+            let restClient = this.get('restClientService');
+            let baseUrl = this.getBaseUrl();
+            let url = `${baseUrl}/api/v2/search`;
+            let data = {
+                types: ['messages'],
+                sortBy: 'created',
+                sortOrder: 'DESC',
+                expand: ['to', 'from'],
+                pageNumber: 1,
+                pageSize: 25,
+                query: [{
+                    type: 'SIMPLE',
+                    value: term,
+                    fields: ['body']
+                }, {
+                    type: 'EXACT',
+                    fields: ['targetJids'],
+                    values: [room.id]
+                }]
+            };
+            return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
         }
     });
 });
@@ -2399,6 +2477,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+e0a44ff5"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+11a12fbe"});
 }
 //# sourceMappingURL=chatExample.map

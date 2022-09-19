@@ -1,16 +1,4 @@
 <div class='issues'>
-    {{!-- <div class='fixtable-container'>
-          {{fixtable-grid 
-            tableClass='table-hover'
-            columns=columnDefs 
-            content=content
-            isLoading=isLoading
-            clientPaging=true
-            pageSize='15'
-            possiblePageSizes=possiblePageSizes
-            baseLocale='en-us'
-          }}
-    </div> --}}
   {{#power-select-multiple
     options=model
     placeholder="Select conversations"
@@ -18,7 +6,7 @@
     onchange=(action (mut group))
     as |group|
   }}
-    {{!-- <i class="fa fa-users fa-lg" aria-hidden="true"></i> --}}
+    {{!-- <i class="fa fa-{{icon}} fa-lg" aria-hidden="true"></i>     --}}
     {{group.name}}
   {{/power-select-multiple}}
 </div>
