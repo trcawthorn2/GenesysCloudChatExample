@@ -1,0 +1,55 @@
+
+@import "ember-bootstrap/bootstrap";
+@import 'ember-power-select';
+@import 'pod-styles';
+@import 'app/components/groups-overview/style.less';
+
+body{
+    margin: 0;
+    background: #fdfdfd;
+    height:100vh;
+    overflow: hidden;
+
+    .main {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        .title {
+            font-size: 1.5em;
+            padding-left: 5px;
+        }
+    }
+}
+
+body > .ember-view {
+    height:100%;
+}
+
+.fixtable{
+    min-height: 250px;
+    border-radius: 5px;
+    overflow: hidden;
+    border-style: solid !important;
+    border-width: 2px !important;
+  
+
+    td > span {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .center{
+        div {
+            display: flex;
+            align-content: center;
+            justify-content: center;
+        }
+    }
+}
+.clickable{
+    cursor: pointer;
+    color: #0645AD;
+    text-decoration: underline;
+}
