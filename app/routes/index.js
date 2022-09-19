@@ -3,8 +3,12 @@ import Ember from 'ember';
 
 export default Route.extend({
     intl: Ember.inject.service(),
-    init(){
+    groupService: Ember.inject.service(),    
+    init() {
         this._super();
         this.get('intl').setLocale('en-us');
+    }, 
+    model(params, transition) {
+        return this.get('groupService').getGroups();
     }
 });

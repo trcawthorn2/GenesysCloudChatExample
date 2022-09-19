@@ -989,25 +989,14 @@ define('chatExample/components/groups-overview/component', ['exports'], function
     });
     exports.default = Ember.Component.extend({
         classNames: ['groups-overview'],
-        authService: Ember.inject.service(),
+        // authService: Ember.inject.service(),
         groupService: Ember.inject.service(),
-        totalGroupCount: undefined,
-        content: [],
-        isLoading: true,
-        possiblePageSizes: [15],
-        groupsUpdated: Ember.observer('authService.authToken', 'groupService.getGroups', function () {
-            this.set('isLoading', true);
-            let rawGroups = this.get('groupService').getGroups().then(data => {
-                this.set('totalGroupCount', data.total);
-                this.set('content', data.entities);
-                this.set('isLoading', false);
-                return Ember.A(data.entities);
-            });
-            return rawGroups;
-        }).on('init'),
-        columnDefs: Ember.computed(function () {
-            return [{ key: 'id', header: 'Id', width: '20%', component: 'link-to-cell' }, { key: 'name', header: 'Name', width: '20%', filter: { type: 'search' }, component: 'link-to-cell' }, { key: 'memberCount', header: 'Member Count', width: '20%' }];
+
+        selectedGroup: Ember.computed(function () {
+            // console.log('### model', this.model);
+            // return this.get('model').find(x => x.id === model.id);
         })
+
     });
 });
 define("chatExample/components/groups-overview/template", ["exports"], function (exports) {
@@ -1016,7 +1005,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "wKTQIHvZ", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"fixtable-container\"],[7],[0,\"\\n          \"],[1,[25,\"fixtable-grid\",null,[[\"tableClass\",\"columns\",\"content\",\"isLoading\",\"clientPaging\",\"pageSize\",\"possiblePageSizes\",\"baseLocale\"],[\"table-hover\",[20,[\"columnDefs\"]],[20,[\"content\"]],[20,[\"isLoading\"]],true,\"15\",[20,[\"possiblePageSizes\"]],\"en-us\"]]],false],[0,\"\\n    \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "+XPnzQS5", "block": "{\"symbols\":[\"group\"],\"statements\":[[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"placeholder\",\"selected\",\"onchange\"],[[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -2032,9 +2021,13 @@ define('chatExample/routes/index', ['exports'], function (exports) {
     });
     exports.default = Ember.Route.extend({
         intl: Ember.inject.service(),
+        groupService: Ember.inject.service(),
         init() {
             this._super();
             this.get('intl').setLocale('en-us');
+        },
+        model(params, transition) {
+            return this.get('groupService').getGroups();
         }
     });
 });
@@ -2136,18 +2129,37 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
         value: true
     });
     exports.default = Ember.Service.extend({
-        store: Ember.inject.service(),
-        authService: Ember.inject.service(),
-        urlStateService: Ember.inject.service(),
-        restClientService: Ember.inject.service(),
-        regionLocatorService: Ember.inject.service(),
+        // store: Ember.inject.service(),
+        // authService: Ember.inject.service(),
+        // urlStateService: Ember.inject.service(),
+        // restClientService: Ember.inject.service(),
+        // regionLocatorService: Ember.inject.service(),
+
         getGroups: function () {
-            if (this.get('authService').authToken) {
-                let state = this.get('urlStateService').cachedState();
-                let urlParams = new URLSearchParams(state);
-                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
-                return this.get('restClientService').get(url + '/api/v2/groups?pageSize=500', { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } });
-            }
+            // if(this.get('authService').authToken){
+            //     let state = this.get('urlStateService').cachedState();
+            //     let urlParams = new URLSearchParams(state);
+            //     let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+            //     return this.get('restClientService').get(url+'/api/v2/groups?pageSize=500', {headers:{'Content-Type':'application/json', 'Authorization': 'bearer '+this.get('authService').authToken}} );
+            // }
+
+            return Ember.RSVP.resolve(Ember.A([{
+                groupName: "People", options: [{
+                    "id": "1",
+                    "name": "Ryan Test"
+                }, {
+                    "id": "2",
+                    "name": "Andrew Schmidt"
+                }]
+            }, {
+                groupName: "Groups", options: [{
+                    "id": "2339d855-7383-4def-b16a-c8de726aeba9",
+                    "name": "Red Stapler Society"
+                }, {
+                    "id": "b42cf716-5acf-4f41-ba08-c293c40be1c2",
+                    "name": "Aymane Group 1"
+                }]
+            }]));
         }
     });
 });
@@ -2350,7 +2362,7 @@ define("chatExample/templates/index", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "JUpMZrU7", "block": "{\"symbols\":[],\"statements\":[[6,\"span\"],[9,\"class\",\"title\"],[7],[0,\"Chat Overview\"],[8],[0,\"\\n\"],[1,[18,\"groups-overview\"],false]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/templates/index.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "fd/9AnDG", "block": "{\"symbols\":[],\"statements\":[[6,\"span\"],[9,\"class\",\"title\"],[7],[0,\"Chat Overview\"],[8],[0,\"\\n\"],[1,[25,\"groups-overview\",null,[[\"model\"],[[20,[\"model\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/templates/index.hbs" } });
 });
 define('chatExample/utils/intl/missing-message', ['exports', 'ember-intl/utils/missing-message'], function (exports, _missingMessage) {
   'use strict';
@@ -2387,6 +2399,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+5510e8c5"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+e0a44ff5"});
 }
 //# sourceMappingURL=chatExample.map
