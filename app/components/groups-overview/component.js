@@ -21,9 +21,12 @@ export default Component.extend({
             }
         },
         searchChatRooms() {
-            this.get('searchService').searchChatRooms(this.term, this.group).then(result => {
-                console.log(result);
-            })
+            if (this.group && this.term && this.group.length > 0) {
+                this.get('searchService').searchChatRooms(this.term, this.group).then(result => {
+                    console.log(result);
+                })
+            }
+
         },
         onKeyPress(event) {
             if (event.key === 'Enter') {
