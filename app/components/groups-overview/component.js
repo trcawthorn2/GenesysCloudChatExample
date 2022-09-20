@@ -1,17 +1,10 @@
 import Component from '@ember/component';
 import Ember from 'ember';
-import { computed } from '@ember/object';
-// import { A } from '@ember/array';
 
 export default Component.extend({
     classNames: ['groups-overview'],        
     groupService: Ember.inject.service(),
     searchService: Ember.inject.service(),
-
-    // selectedGroup: computed(function () {
-        // return this.get('model').find(x => x.id === model.id);
-    // }),
-
     actions: {
         searchRepo(searchValue) {
             console.log(searchValue);
@@ -33,8 +26,4 @@ export default Component.extend({
             })
         }
     }
-    // icon: computed('model', function () {
-    //     console.log('### model', this.model);
-    //     return 'user';
-    // })
 });

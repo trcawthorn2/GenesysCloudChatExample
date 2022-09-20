@@ -989,14 +989,8 @@ define('chatExample/components/groups-overview/component', ['exports'], function
     });
     exports.default = Ember.Component.extend({
         classNames: ['groups-overview'],
-        // authService: Ember.inject.service(),
         groupService: Ember.inject.service(),
         searchService: Ember.inject.service(),
-
-        // selectedGroup: computed(function () {
-        // return this.get('model').find(x => x.id === model.id);
-        // }),
-
         actions: {
             searchRepo(searchValue) {
                 console.log(searchValue);
@@ -1018,10 +1012,6 @@ define('chatExample/components/groups-overview/component', ['exports'], function
                 });
             }
         }
-        // icon: computed('model', function () {
-        //     console.log('### model', this.model);
-        //     return 'user';
-        // })
     });
 });
 define("chatExample/components/groups-overview/template", ["exports"], function (exports) {
@@ -2051,9 +2041,28 @@ define('chatExample/routes/index', ['exports'], function (exports) {
             this._super();
             this.get('intl').setLocale('en-us');
         },
-        model(params, transition) {
-            return this.get('groupService').getGroups().then(results => {
-                return results.entities;
+        model() {
+            return this.get('groupService').getGroups().then(groups => {
+                return this.get('groupService').getFavorites().then(favs => {
+                    const favoriteIds = favs.res.map(x => x.favoriteId);
+                    const favoriteGroups = Ember.A();
+                    groups.entities.forEach(group => {
+                        if (favoriteIds.includes(group.id)) {
+                            favoriteGroups.pushObject(group);
+                            groups.entities.removeObject(group);
+                        }
+                    });
+
+                    const response = Ember.A([{
+                        groupName: "Favorites", options: favoriteGroups
+                    }, {
+                        groupName: "Official Groups", options: groups.entities
+                    }]);
+
+                    return response;
+                }).catch(error => {
+                    return groups.entities;
+                });
             });
         }
     });
@@ -2251,6 +2260,18 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
         restClientService: Ember.inject.service(),
         regionLocatorService: Ember.inject.service(),
 
+        getFavorites: function () {
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+
+                return this.getCurrentUser().then(user => {
+                    return this.get('restClientService').get(`https://apps.inindca.com/directory/api/v3/people/${user.id}/favorites?entityType=person,group`, { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } });
+                });
+            }
+        },
+
         getGroups: function () {
             if (this.get('authService').authToken) {
                 let state = this.get('urlStateService').cachedState();
@@ -2258,16 +2279,21 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
                 let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
                 return this.get('restClientService').get(url + '/api/v2/groups?pageSize=500', { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } });
             }
-            // return RSVP.resolve(A([
-            //     {
-            //         "id": "2339d855-7383-4def-b16a-c8de726aeba9",
-            //         "name": "Red Stapler Society"
-            //     },
-            //     {
-            //         "id": "b42cf716-5acf-4f41-ba08-c293c40be1c2",
-            //         "name": "Aymane Group 1"
-            //     }
-            // ]));
+        },
+
+        getCurrentUser: function () {
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+
+                let headers = {
+                    'Content-Type': 'application/json',
+                    Authorization: 'bearer ' + this.get('authService').authToken
+                };
+
+                return this.get('restClientService').get(url + '/api/v2/users/me?expand=groups,favorites', { headers });
+            }
         }
     });
 });
@@ -2567,6 +2593,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+817775f6"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+38b88778"});
 }
 //# sourceMappingURL=chatExample.map
