@@ -8,7 +8,8 @@
     onchange=(action (mut group))
     as |group|
   }}
-    <i class="fa fa-users fa-lg" aria-hidden="true"></i> {{group.name}}
+    {{!-- <i class="fa fa-users fa-lg" aria-hidden="true"></i> {{group.name}} --}}
+    {{group.name}}
   {{/power-select-multiple}}
 </div>
 {{input value=term}}
