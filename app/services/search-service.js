@@ -12,7 +12,7 @@ export default Service.extend({
         let urlParams = new URLSearchParams(state);
         return this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
     },
-    serachChatRooms: async function(term, chatRooms) {
+    searchChatRooms: async function(term, chatRooms) {
         if (this.get('authService').authToken) {
             let results = [];
             chatRooms.forEach(async (room) => {

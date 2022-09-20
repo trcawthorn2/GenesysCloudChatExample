@@ -1,5 +1,7 @@
+
 <div class='issues'>
   {{#power-select-multiple
+    search=(action "searchRepo")
     options=model
     placeholder="Select conversations"
     selected=group
@@ -9,3 +11,5 @@
     <i class="fa fa-users fa-lg" aria-hidden="true"></i> {{group.name}}
   {{/power-select-multiple}}
 </div>
+{{input value=term}}
+<button onclick={{action 'searchChatRooms'}}>Search</button>
