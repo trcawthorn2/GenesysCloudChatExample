@@ -16,7 +16,8 @@ export default Service.extend({
     post: function(url, data, options) {
         options.url = url;
         options.method = 'POST'
-        options.data = options.processData ? JSON.stringify(data) : data;
+        // options.data = options.processData ? JSON.stringify(data) : data;
+        options.data = JSON.stringify(data);
         return $.ajax(options);
     },
     put: function(url, data, options) {
@@ -27,7 +28,7 @@ export default Service.extend({
     },
     delete: function(url, options) {
         options.url = url;
-        options.method = 'PSOT'
+        options.method = 'DELETE'
         return $.ajax(options);
     }
 });

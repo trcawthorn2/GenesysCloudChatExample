@@ -22,7 +22,8 @@ export default Service.extend({
             return results;
         }
     },
-    searchChat: function (term, room) {
+    searchChat: function (term, chatRooms) {
+        let jabberIds = chatRooms.map(x => x.chat.jabberId);
         let restClient = this.get('restClientService');
         let baseUrl = this.getBaseUrl();
         let url = `${baseUrl}/api/v2/search`;
@@ -42,10 +43,10 @@ export default Service.extend({
                 {
                     type:'EXACT',
                     fields:['targetJids'],
-                    values:[room.chat.jabberId]                    
+                    values:jabberIds                 
                 }
             ]
         };
-        return restClient.post(url, JSON.stringify(data), restClient.getOptions(this.get('authService').authToken));
+        return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
     }
 });

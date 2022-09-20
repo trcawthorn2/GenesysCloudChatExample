@@ -14,3 +14,10 @@
 </div>
 {{input value=term}}
 <button onclick={{action 'searchChatRooms'}}>Search</button>
+
+<h4>Results Found: {{resultsCount}}</h4>
+
+{{#each resultsContent as |result|}}    
+    <li>{{result.from.name}}: {{result.body}}</li>
+    <hr />
+{{/each}}

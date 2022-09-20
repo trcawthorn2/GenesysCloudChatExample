@@ -4,11 +4,11 @@ import Ember from 'ember';
 export default Component.extend({
     classNames: ['groups-overview'],        
     groupService: Ember.inject.service(),
-    searchService: Ember.inject.service(),
+    searchService: Ember.inject.service(),    
     actions: {
         searchRepo(searchValue) {
-            console.log(searchValue);
-            console.log(this.model);
+            // console.log(searchValue);
+            // console.log(this.model);
             if (searchValue && searchValue.length > 1) {
                 return this.model.filter(group => {
                     const name = group.name//,listingName = name[selectedLocale] || name['en-us'];
@@ -21,9 +21,11 @@ export default Component.extend({
             }
         },
         searchChatRooms() {
-            this.get('searchService').searchChatRooms(this.term, this.group).then(result => {
-                console.log(result);
-            })
+            return this.get('searchService').searchChat(this.term, this.group).then(result => {                
+                this.set('resultsTotal', result.total);
+                this.set('resultsContent', result.results);
+                return result;
+            });
         }
     }
 });
