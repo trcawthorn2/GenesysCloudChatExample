@@ -990,12 +990,26 @@ define('chatExample/components/groups-overview/component', ['exports'], function
     exports.default = Ember.Component.extend({
         classNames: ['groups-overview'],
         // authService: Ember.inject.service(),
-        groupService: Ember.inject.service()
+        groupService: Ember.inject.service(),
 
         // selectedGroup: computed(function () {
         // return this.get('model').find(x => x.id === model.id);
         // }),
 
+        actions: {
+            searchRepo(searchValue) {
+                if (searchValue && searchValue.length > 1) {
+                    return this.model.filter(group => {
+                        const name = group.name; //,listingName = name[selectedLocale] || name['en-us'];
+
+                        //this.set('currentPage', 1);
+                        return name && name.toLowerCase().includes(searchValue.toLowerCase());
+                    });
+                } else {
+                    return this.model;
+                }
+            }
+        }
         // icon: computed('model', function () {
         //     console.log('### model', this.model);
         //     return 'user';
@@ -1008,7 +1022,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "BViLi36T", "block": "{\"symbols\":[\"group\"],\"statements\":[[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"placeholder\",\"selected\",\"onchange\"],[[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[6,\"i\"],[9,\"class\",\"fa fa-users fa-lg\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\" \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "AbP93KeG", "block": "{\"symbols\":[\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[6,\"i\"],[9,\"class\",\"fa fa-users fa-lg\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\" \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -2545,6 +2559,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+817775f6"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+f6c1072c"});
 }
 //# sourceMappingURL=chatExample.map

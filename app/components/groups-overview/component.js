@@ -14,8 +14,6 @@ export default Component.extend({
 
     actions: {
         searchRepo(searchValue) {
-            console.log(searchValue);
-            console.log(this.model);
             if (searchValue && searchValue.length > 1) {
                 return this.model.filter(group => {
                     const name = group.name//,listingName = name[selectedLocale] || name['en-us'];
