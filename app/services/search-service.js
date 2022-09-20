@@ -22,7 +22,7 @@ export default Service.extend({
             return results;
         }
     },
-    searchChat: function(term, room) {
+    searchChat: function (term, room) {
         let restClient = this.get('restClientService');
         let baseUrl = this.getBaseUrl();
         let url = `${baseUrl}/api/v2/search`;
@@ -42,29 +42,10 @@ export default Service.extend({
                 {
                     type:'EXACT',
                     fields:['targetJids'],
-                    values:[room.id]
+                    values:[room.chat.jabberId]                    
                 }
             ]
         };
         return restClient.post(url, JSON.stringify(data), restClient.getOptions(this.get('authService').authToken));
     }
 });
-
-
-// {
-// 	"types": ["messages"],
-// 	"sortBy": "created",
-// 	"sortOrder": "DESC",
-// 	"expand": ["to", "from"],
-// 	"pageNumber": 1,
-// 	"pageSize": 25,
-// 	"query": [{
-// 		"type": "SIMPLE",
-// 		"value": "test",
-// 		"fields": ["body"]
-// 	}, {
-// 		"type": "EXACT",
-// 		"fields": ["targetJids"],
-// 		"values": ["6328628cf49d79198be84422@conference.dev-globalalliances-tests.orgspan.com"]
-// 	}]
-// }
