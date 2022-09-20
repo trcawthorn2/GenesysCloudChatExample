@@ -46,6 +46,25 @@ export default Service.extend({
                 }
             ]
         };
-        return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
+        return restClient.post(url, JSON.stringify(data), restClient.getOptions(this.get('authService').authToken));
     }
 });
+
+
+// {
+// 	"types": ["messages"],
+// 	"sortBy": "created",
+// 	"sortOrder": "DESC",
+// 	"expand": ["to", "from"],
+// 	"pageNumber": 1,
+// 	"pageSize": 25,
+// 	"query": [{
+// 		"type": "SIMPLE",
+// 		"value": "test",
+// 		"fields": ["body"]
+// 	}, {
+// 		"type": "EXACT",
+// 		"fields": ["targetJids"],
+// 		"values": ["6328628cf49d79198be84422@conference.dev-globalalliances-tests.orgspan.com"]
+// 	}]
+// }
