@@ -21,7 +21,7 @@ export default Component.extend({
         searchChatRooms() {
             if (this.group && this.term && this.group.length > 0) {                
                 return this.get('searchService').searchChat(this.term, this.group).then(result => {                
-                    this.set('resultsTotal', result.total);
+                    this.set('resultsCount', result.total);
                     this.set('resultsContent', result.results);
                     return result;
                 });

@@ -1007,7 +1007,7 @@ define('chatExample/components/groups-overview/component', ['exports'], function
             searchChatRooms() {
                 if (this.group && this.term && this.group.length > 0) {
                     return this.get('searchService').searchChat(this.term, this.group).then(result => {
-                        this.set('resultsTotal', result.total);
+                        this.set('resultsCount', result.total);
                         this.set('resultsContent', result.results);
                         return result;
                     });
@@ -1027,7 +1027,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "PiMSnpgf", "block": "{\"symbols\":[\"result\",\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,2,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[8],[0,\"\\n\"],[1,[25,\"input\",null,[[\"value\",\"keyPress\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null]]]],false],[0,\"\\n\"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8],[0,\"\\n\\n\\n\"],[6,\"h4\"],[7],[0,\"Results Found: \"],[1,[18,\"resultsCount\"],false],[8],[0,\"\\n\\n\"],[4,\"each\",[[20,[\"resultsContent\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[1,[19,1,[\"from\",\"name\"]],false],[0,\": \"],[1,[19,1,[\"body\"]],false],[8],[0,\"\\n    \"],[6,\"hr\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "EvWtiG+S", "block": "{\"symbols\":[\"result\",\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,2,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[8],[0,\"\\n\"],[1,[25,\"input\",null,[[\"value\",\"keyPress\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null]]]],false],[0,\"\\n\"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8],[0,\"\\n\\n\\n\"],[6,\"h4\"],[7],[0,\"Results Found: \"],[1,[18,\"resultsCount\"],false],[8],[0,\"\\n\\n\"],[4,\"each\",[[20,[\"resultsContent\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[1,[19,1,[\"from\",\"name\"]],false],[0,\": \"],[1,[19,1,[\"body\"]],false],[0,\" (\"],[1,[25,\"convert-timestamp\",[[19,1,[\"created\"]]],null],false],[0,\")\"],[8],[0,\"\\n    \"],[6,\"hr\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -1315,6 +1315,19 @@ define('chatExample/helpers/cancel-all', ['exports', 'ember-concurrency/helpers/
       return _cancelAll.default;
     }
   });
+});
+define('chatExample/helpers/convert-timestamp', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.convertTimestamp = convertTimestamp;
+  function convertTimestamp(params /*, hash*/) {
+    return new Date(params[0]).toDateString();
+  }
+
+  exports.default = Ember.Helper.helper(convertTimestamp);
 });
 define('chatExample/helpers/ember-power-select-is-group', ['exports', 'ember-power-select/helpers/ember-power-select-is-group'], function (exports, _emberPowerSelectIsGroup) {
   'use strict';
