@@ -8,9 +8,31 @@ export default Route.extend({
         this._super();
         this.get('intl').setLocale('en-us');
     }, 
-    model(params, transition) {
-        return this.get('groupService').getGroups().then(results => {
-            return results.entities;
+    model() {
+        return this.get('groupService').getGroups().then(groups => {
+            return this.get('groupService').getFavorites().then(favs => {
+                const favoriteIds = favs.res.map(x => x.favoriteId);
+                const favoriteGroups = Ember.A();
+                groups.entities.forEach(group => {                    
+                    if (favoriteIds.includes(group.id)) {
+                        favoriteGroups.pushObject(group);
+                        groups.entities.removeObject(group);
+                    }
+                });
+
+                const response = Ember.A([
+                    {
+                        groupName: "Favorites", options: favoriteGroups
+                    },
+                    {
+                        groupName: "Official Groups", options: groups.entities
+                    }
+                ]);
+
+                return response;
+            }).catch((error) => {
+                return groups.entities;
+            });
         });
     }
 });
