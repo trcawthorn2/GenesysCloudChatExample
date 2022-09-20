@@ -12,7 +12,7 @@ export default Service.extend({
         let urlParams = new URLSearchParams(state);
         return this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
     },
-    serachChatRooms: async function(term, chatRooms) {
+    searchChatRooms: async function(term, chatRooms) {
         if (this.get('authService').authToken) {
             let results = [];
             chatRooms.forEach(async (room) => {
@@ -22,7 +22,8 @@ export default Service.extend({
             return results;
         }
     },
-    searchChat: function(term, room) {
+    searchChat: function (term, chatRooms) {
+        let jabberIds = chatRooms.map(x => x.chat.jabberId);
         let restClient = this.get('restClientService');
         let baseUrl = this.getBaseUrl();
         let url = `${baseUrl}/api/v2/search`;
@@ -42,7 +43,7 @@ export default Service.extend({
                 {
                     type:'EXACT',
                     fields:['targetJids'],
-                    values:[room.id]
+                    values:jabberIds                 
                 }
             ]
         };

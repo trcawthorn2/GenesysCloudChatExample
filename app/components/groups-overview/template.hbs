@@ -8,6 +8,17 @@
     onchange=(action (mut group))
     as |group|
   }}
-    <i class="fa fa-users fa-lg" aria-hidden="true"></i> {{group.name}}
+    {{!-- <i class="fa fa-users fa-lg" aria-hidden="true"></i> {{group.name}} --}}
+    {{group.name}}
   {{/power-select-multiple}}
 </div>
+{{input value=term keyPress=(action 'onKeyPress')}}
+<button onclick={{action 'searchChatRooms'}}>Search</button>
+
+
+<h4>Results Found: {{resultsCount}}</h4>
+
+{{#each resultsContent as |result|}}    
+    <li>{{result.from.name}}: {{result.body}}</li>
+    <hr />
+{{/each}}

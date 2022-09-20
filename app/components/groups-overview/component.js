@@ -1,17 +1,10 @@
 import Component from '@ember/component';
 import Ember from 'ember';
-import { computed } from '@ember/object';
-// import { A } from '@ember/array';
 
 export default Component.extend({
-    classNames: ['groups-overview'],    
-    // authService: Ember.inject.service(),
+    classNames: ['groups-overview'],        
     groupService: Ember.inject.service(),
-    
-    // selectedGroup: computed(function () {
-        // return this.get('model').find(x => x.id === model.id);
-    // }),
-
+    searchService: Ember.inject.service(),    
     actions: {
         searchRepo(searchValue) {
             if (searchValue && searchValue.length > 1) {
@@ -24,10 +17,21 @@ export default Component.extend({
             } else {
                 return this.model;
             }
+        },
+        searchChatRooms() {
+            if (this.group && this.term && this.group.length > 0) {                
+                return this.get('searchService').searchChat(this.term, this.group).then(result => {                
+                    this.set('resultsTotal', result.total);
+                    this.set('resultsContent', result.results);
+                    return result;
+                });
+            }
+
+        },
+        onKeyPress(event) {
+            if (event.key === 'Enter') {
+                this.send('searchChatRooms');
+            }
         }
     }
-    // icon: computed('model', function () {
-    //     console.log('### model', this.model);
-    //     return 'user';
-    // })
 });

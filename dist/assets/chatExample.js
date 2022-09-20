@@ -989,13 +989,8 @@ define('chatExample/components/groups-overview/component', ['exports'], function
     });
     exports.default = Ember.Component.extend({
         classNames: ['groups-overview'],
-        // authService: Ember.inject.service(),
         groupService: Ember.inject.service(),
-
-        // selectedGroup: computed(function () {
-        // return this.get('model').find(x => x.id === model.id);
-        // }),
-
+        searchService: Ember.inject.service(),
         actions: {
             searchRepo(searchValue) {
                 if (searchValue && searchValue.length > 1) {
@@ -1008,12 +1003,22 @@ define('chatExample/components/groups-overview/component', ['exports'], function
                 } else {
                     return this.model;
                 }
+            },
+            searchChatRooms() {
+                if (this.group && this.term && this.group.length > 0) {
+                    return this.get('searchService').searchChat(this.term, this.group).then(result => {
+                        this.set('resultsTotal', result.total);
+                        this.set('resultsContent', result.results);
+                        return result;
+                    });
+                }
+            },
+            onKeyPress(event) {
+                if (event.key === 'Enter') {
+                    this.send('searchChatRooms');
+                }
             }
         }
-        // icon: computed('model', function () {
-        //     console.log('### model', this.model);
-        //     return 'user';
-        // })
     });
 });
 define("chatExample/components/groups-overview/template", ["exports"], function (exports) {
@@ -1022,7 +1027,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "AbP93KeG", "block": "{\"symbols\":[\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[6,\"i\"],[9,\"class\",\"fa fa-users fa-lg\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\" \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "PiMSnpgf", "block": "{\"symbols\":[\"result\",\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,2,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[8],[0,\"\\n\"],[1,[25,\"input\",null,[[\"value\",\"keyPress\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null]]]],false],[0,\"\\n\"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8],[0,\"\\n\\n\\n\"],[6,\"h4\"],[7],[0,\"Results Found: \"],[1,[18,\"resultsCount\"],false],[8],[0,\"\\n\\n\"],[4,\"each\",[[20,[\"resultsContent\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[1,[19,1,[\"from\",\"name\"]],false],[0,\": \"],[1,[19,1,[\"body\"]],false],[8],[0,\"\\n    \"],[6,\"hr\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -2043,9 +2048,28 @@ define('chatExample/routes/index', ['exports'], function (exports) {
             this._super();
             this.get('intl').setLocale('en-us');
         },
-        model(params, transition) {
-            return this.get('groupService').getGroups().then(results => {
-                return results.entities;
+        model() {
+            return this.get('groupService').getGroups().then(groups => {
+                return this.get('groupService').getFavorites().then(favs => {
+                    const favoriteIds = favs.res.map(x => x.favoriteId);
+                    const favoriteGroups = Ember.A();
+                    groups.entities.forEach(group => {
+                        if (favoriteIds.includes(group.id)) {
+                            favoriteGroups.pushObject(group);
+                            groups.entities.removeObject(group);
+                        }
+                    });
+
+                    const response = Ember.A([{
+                        groupName: "Favorites", options: favoriteGroups
+                    }, {
+                        groupName: "Official Groups", options: groups.entities
+                    }]);
+
+                    return response;
+                }).catch(error => {
+                    return groups.entities;
+                });
             });
         }
     });
@@ -2243,6 +2267,18 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
         restClientService: Ember.inject.service(),
         regionLocatorService: Ember.inject.service(),
 
+        getFavorites: function () {
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+
+                return this.getCurrentUser().then(user => {
+                    return this.get('restClientService').get(`https://apps.inindca.com/directory/api/v3/people/${user.id}/favorites?entityType=person,group`, { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } });
+                });
+            }
+        },
+
         getGroups: function () {
             if (this.get('authService').authToken) {
                 let state = this.get('urlStateService').cachedState();
@@ -2250,16 +2286,21 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
                 let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
                 return this.get('restClientService').get(url + '/api/v2/groups?pageSize=500', { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } });
             }
-            // return RSVP.resolve(A([
-            //     {
-            //         "id": "2339d855-7383-4def-b16a-c8de726aeba9",
-            //         "name": "Red Stapler Society"
-            //     },
-            //     {
-            //         "id": "b42cf716-5acf-4f41-ba08-c293c40be1c2",
-            //         "name": "Aymane Group 1"
-            //     }
-            // ]));
+        },
+
+        getCurrentUser: function () {
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+
+                let headers = {
+                    'Content-Type': 'application/json',
+                    Authorization: 'bearer ' + this.get('authService').authToken
+                };
+
+                return this.get('restClientService').get(url + '/api/v2/users/me?expand=groups,favorites', { headers });
+            }
         }
     });
 });
@@ -2385,7 +2426,8 @@ define('chatExample/services/rest-client-service', ['exports'], function (export
         post: function (url, data, options) {
             options.url = url;
             options.method = 'POST';
-            options.data = options.processData ? JSON.stringify(data) : data;
+            // options.data = options.processData ? JSON.stringify(data) : data;
+            options.data = JSON.stringify(data);
             return $.ajax(options);
         },
         put: function (url, data, options) {
@@ -2396,7 +2438,7 @@ define('chatExample/services/rest-client-service', ['exports'], function (export
         },
         delete: function (url, options) {
             options.url = url;
-            options.method = 'PSOT';
+            options.method = 'DELETE';
             return $.ajax(options);
         }
     });
@@ -2418,7 +2460,7 @@ define('chatExample/services/search-service', ['exports'], function (exports) {
             let urlParams = new URLSearchParams(state);
             return this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
         },
-        serachChatRooms: async function (term, chatRooms) {
+        searchChatRooms: async function (term, chatRooms) {
             if (this.get('authService').authToken) {
                 let results = [];
                 chatRooms.forEach(async room => {
@@ -2428,7 +2470,8 @@ define('chatExample/services/search-service', ['exports'], function (exports) {
                 return results;
             }
         },
-        searchChat: function (term, room) {
+        searchChat: function (term, chatRooms) {
+            let jabberIds = chatRooms.map(x => x.chat.jabberId);
             let restClient = this.get('restClientService');
             let baseUrl = this.getBaseUrl();
             let url = `${baseUrl}/api/v2/search`;
@@ -2446,7 +2489,7 @@ define('chatExample/services/search-service', ['exports'], function (exports) {
                 }, {
                     type: 'EXACT',
                     fields: ['targetJids'],
-                    values: [room.id]
+                    values: jabberIds
                 }]
             };
             return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
