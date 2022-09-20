@@ -1,9 +1,9 @@
 
-<div class='issues'>
+<div class='groups-container'>
   {{#power-select-multiple
     search=(action "searchRepo")
     options=model
-    placeholder="Select conversations"
+    placeholder="Select conversations to Search"
     selected=group
     onchange=(action (mut group))
     as |group|
@@ -12,13 +12,17 @@
     {{group.name}}
   {{/power-select-multiple}}
 </div>
-{{input value=term keyPress=(action 'onKeyPress')}}
-<button onclick={{action 'searchChatRooms'}}>Search</button>
+<div class="search-container">
+  {{input value=term keyPress=(action 'onKeyPress') placeholder="Type search term"}}
+  <button onclick={{action 'searchChatRooms'}}>Search</button>
+</div>
 
+<div class="results-container">
+  <h4>Results Found: {{resultsCount}}</h4>
 
-<h4>Results Found: {{resultsCount}}</h4>
+  {{#each resultsContent as |result|}}    
+      <li>{{result.from.name}}: {{result.body}} ({{convert-timestamp result.created}})</li>
+      <hr />
+  {{/each}}
+  </div>
 
-{{#each resultsContent as |result|}}    
-    <li>{{result.from.name}}: {{result.body}} ({{convert-timestamp result.created}})</li>
-    <hr />
-{{/each}}
