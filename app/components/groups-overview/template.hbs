@@ -12,8 +12,9 @@
     {{group.name}}
   {{/power-select-multiple}}
 </div>
-{{input value=term}}
+{{input value=term keyPress=(action 'onKeyPress')}}
 <button onclick={{action 'searchChatRooms'}}>Search</button>
+
 
 <h4>Results Found: {{resultsCount}}</h4>
 
