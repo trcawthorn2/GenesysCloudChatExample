@@ -1008,7 +1008,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "+XPnzQS5", "block": "{\"symbols\":[\"group\"],\"statements\":[[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"placeholder\",\"selected\",\"onchange\"],[[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "BViLi36T", "block": "{\"symbols\":[\"group\"],\"statements\":[[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"placeholder\",\"selected\",\"onchange\"],[[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[6,\"i\"],[9,\"class\",\"fa fa-users fa-lg\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\" \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -2030,7 +2030,9 @@ define('chatExample/routes/index', ['exports'], function (exports) {
             this.get('intl').setLocale('en-us');
         },
         model(params, transition) {
-            return this.get('groupService').getGroups();
+            return this.get('groupService').getGroups().then(results => {
+                return results.entities;
+            });
         }
     });
 });
@@ -2125,6 +2127,95 @@ define('chatExample/services/browser-storage-service', ['exports'], function (ex
         }
     });
 });
+define('chatExample/services/chat-groups-service', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Service.extend({
+        authService: Ember.inject.service(),
+        urlStateService: Ember.inject.service(),
+        regionLocatorService: Ember.inject.service(),
+        restClientService: Ember.inject.service(),
+
+        getCurrentChatGroups: function () {
+            if (this.get('authService').authToken) {
+                this.getCurrentUser().then(results => {
+                    console.log(results);
+
+                    let userId = results.id;
+
+                    this.getFavorites(userId).then(results => {
+                        console.log(results);
+                        // this.getGroupDetailsFromGroupIds(results.res).then(moreResults => {
+                        //     console.log(moreResults);
+                        // });
+                    });
+
+                    //let groups = results.groups;
+                    //let favorites = results.favorites;
+                });
+            }
+        },
+
+        getCurrentUser: function () {
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+
+                let headers = {
+                    'Content-Type': 'application/json',
+                    Authorization: 'bearer ' + this.get('authService').authToken
+                };
+
+                return this.get('restClientService').get(url + '/api/v2/users/me?expand=groups,favorites', { headers });
+            }
+        },
+
+        getFavorites: function (userId) {
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionUrl(urlParams.get('region'));
+
+                let headers = {
+                    'Content-Type': 'application/json',
+                    //'Access-Control-Allow-Origin': '*',
+                    Authorization: 'bearer ' + this.get('authService').authToken
+                };
+
+                return this.get('restClientService').get(url + '/directory/api/v3/people/' + userId + '/favorites?entityType=group,person', { headers });
+            }
+        },
+
+        getGroupDetailsFromGroupIds: function (groups) {
+            if (this.get('authService').authToken) {
+                let state = this.get('urlStateService').cachedState();
+                let urlParams = new URLSearchParams(state);
+                let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
+
+                let headers = {
+                    'Content-Type': 'application/json',
+                    Authorization: 'bearer ' + this.get('authService').authToken
+                };
+
+                let ids = '';
+
+                groups.forEach((x, index, array) => {
+                    ids += x.id;
+                    if (index !== array.length - 1) {
+                        ids += ',';
+                    }
+                });
+
+                return this.get('restClientService').get(url + '/api/v2/groups?id=' + ids, { headers });
+            }
+        }
+
+    });
+});
 define('chatExample/services/group-service', ['exports'], function (exports) {
     'use strict';
 
@@ -2143,41 +2234,18 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
                 let state = this.get('urlStateService').cachedState();
                 let urlParams = new URLSearchParams(state);
                 let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
-
-                console.log('### urlParams', urlParams);
-                console.log('### state', state);
-                console.log('### url', url);
-
-                // return this.get('restClientService').get(url+'/api/v2/groups?pageSize=500', {headers:{'Content-Type':'application/json', 'Authorization': 'bearer '+this.get('authService').authToken}} );
+                return this.get('restClientService').get(url + '/api/v2/groups?pageSize=500', { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } });
             }
-
-            // return RSVP.resolve(A(
-            //     [{
-            //         groupName: "People", options: [
-            //             {
-            //                 "id": "1",
-            //                 "name": "Ryan Test"
-            //             },
-            //             {
-            //                 "id": "2",
-            //                 "name": "Andrew Schmidt"
-            //             }
-
-            //         ]
+            // return RSVP.resolve(A([
+            //     {
+            //         "id": "2339d855-7383-4def-b16a-c8de726aeba9",
+            //         "name": "Red Stapler Society"
             //     },
             //     {
-            //         groupName: "Groups", options: [
-            //             {
-            //                 "id": "2339d855-7383-4def-b16a-c8de726aeba9",
-            //                 "name": "Red Stapler Society"
-            //             },
-            //             {
-            //                 "id": "b42cf716-5acf-4f41-ba08-c293c40be1c2",
-            //                 "name": "Aymane Group 1"
-            //             }
-            //         ]
-            //     }]
-            // ))
+            //         "id": "b42cf716-5acf-4f41-ba08-c293c40be1c2",
+            //         "name": "Aymane Group 1"
+            //     }
+            // ]));
         }
     });
 });
@@ -2477,6 +2545,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+11a12fbe"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+817775f6"});
 }
 //# sourceMappingURL=chatExample.map

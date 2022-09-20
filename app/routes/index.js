@@ -9,6 +9,8 @@ export default Route.extend({
         this.get('intl').setLocale('en-us');
     }, 
     model(params, transition) {
-        return this.get('groupService').getGroups();
+        return this.get('groupService').getGroups().then(results => {
+            return results.entities;
+        });
     }
 });
