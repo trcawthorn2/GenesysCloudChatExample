@@ -12,6 +12,22 @@ export default Component.extend({
         // return this.get('model').find(x => x.id === model.id);
     // }),
 
+    actions: {
+        searchRepo(searchValue) {
+            console.log(searchValue);
+            console.log(this.model);
+            if (searchValue && searchValue.length > 1) {
+                return this.model.filter(group => {
+                    const name = group.name//,listingName = name[selectedLocale] || name['en-us'];
+    
+                    //this.set('currentPage', 1);
+                    return name && name.toLowerCase().includes(searchValue.toLowerCase());
+                });
+            } else {
+                return this.model;
+            }
+        }
+    }
     // icon: computed('model', function () {
     //     console.log('### model', this.model);
     //     return 'user';

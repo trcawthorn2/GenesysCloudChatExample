@@ -1,5 +1,7 @@
+
 <div class='issues'>
   {{#power-select-multiple
+    search=(action "searchRepo")
     options=model
     placeholder="Select conversations"
     selected=group
