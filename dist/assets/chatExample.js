@@ -1010,6 +1010,11 @@ define('chatExample/components/groups-overview/component', ['exports'], function
                 this.get('searchService').searchChatRooms(this.term, this.group).then(result => {
                     console.log(result);
                 });
+            },
+            onKeyPress(event) {
+                if (event.key === 'Enter') {
+                    this.send('searchChatRooms');
+                }
             }
         }
     });
@@ -1020,7 +1025,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "AYNz+jYm", "block": "{\"symbols\":[\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\"],[1,[25,\"input\",null,[[\"value\"],[[20,[\"term\"]]]]],false],[0,\"\\n\"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "cYwtZYT2", "block": "{\"symbols\":[\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"issues\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\"],[1,[25,\"input\",null,[[\"value\",\"keyPress\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null]]]],false],[0,\"\\n\"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -2480,10 +2485,10 @@ define('chatExample/services/search-service', ['exports'], function (exports) {
                 }, {
                     type: 'EXACT',
                     fields: ['targetJids'],
-                    values: [room.id]
+                    values: [room.chat.jabberId]
                 }]
             };
-            return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
+            return restClient.post(url, JSON.stringify(data), restClient.getOptions(this.get('authService').authToken));
         }
     });
 });
@@ -2593,6 +2598,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+38b88778"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+817775f6"});
 }
 //# sourceMappingURL=chatExample.map
