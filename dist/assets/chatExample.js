@@ -991,13 +991,13 @@ define('chatExample/components/groups-overview/component', ['exports'], function
         classNames: ['groups-overview'],
         groupService: Ember.inject.service(),
         searchService: Ember.inject.service(),
+
         actions: {
             searchRepo(searchValue) {
                 if (searchValue && searchValue.length > 1) {
-                    return this.model.filter(group => {
-                        const name = group.name; //,listingName = name[selectedLocale] || name['en-us'];
-
-                        //this.set('currentPage', 1);
+                    let allGroups = this.model[1].options;
+                    return allGroups.filter(group => {
+                        const name = group.name;
                         return name && name.toLowerCase().includes(searchValue.toLowerCase());
                     });
                 } else {
