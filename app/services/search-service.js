@@ -7,6 +7,8 @@ export default Service.extend({
     urlStateService: Ember.inject.service(),
     restClientService: Ember.inject.service(),
     regionLocatorService: Ember.inject.service(),
+    groupService: Ember.inject.service(),
+
     getBaseUrl: function() {
         let state = this.get('urlStateService').cachedState();
         let urlParams = new URLSearchParams(state);
@@ -47,6 +49,29 @@ export default Service.extend({
                 }
             ]
         };
-        return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
+        return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken)).then(response => {
+            let results = response.results;
+
+            let groupService = this.get('groupService');
+
+
+            results.forEach(x => {
+                let jid = x.to.jid;
+
+                let group = groupService.favoriteGroups.find(y => {
+                    return y.chat.jabberId.startsWith(jid)
+                });
+                if (!group) {
+                    group = groupService.allGroups.find(y => {
+                        return y.chat.jabberId.startsWith(jid)
+                    });
+                }
+                if (group) {
+                    x.chatRoomName = group.name;
+                }
+            })
+
+            return response;
+        });
     }
 });

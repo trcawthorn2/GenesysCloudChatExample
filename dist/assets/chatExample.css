@@ -7002,8 +7002,14 @@ button.close {
 .__groups-overview__6359f .groups-overview {
   padding: 10px;
 }
+.__groups-overview__6359f .groups-overview .search-container {
+  padding-top: 10px;
+}
 .groups-overview {
   padding: 10px;
+}
+.groups-overview .search-container {
+  padding-top: 10px;
 }
 body {
   margin: 20px;

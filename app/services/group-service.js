@@ -8,6 +8,8 @@ export default Service.extend({
     urlStateService: Ember.inject.service(),
     restClientService: Ember.inject.service(),
     regionLocatorService: Ember.inject.service(),
+    allGroups: [],
+    favoriteGroups: [],
     
     getFavorites: function () {
         if (this.get('authService').authToken) {
@@ -26,7 +28,10 @@ export default Service.extend({
             let state = this.get('urlStateService').cachedState();
             let urlParams = new URLSearchParams(state);
             let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
-            return this.get('restClientService').get(url+'/api/v2/groups?pageSize=500', {headers:{'Content-Type':'application/json', 'Authorization': 'bearer '+this.get('authService').authToken}} );
+            return this.get('restClientService').get(url+'/api/v2/groups?pageSize=500', {headers:{'Content-Type':'application/json', 'Authorization': 'bearer '+this.get('authService').authToken}} ).then(results => {
+                this.allGroups = results.entities;
+                return results;
+            });
         }
     },
 
