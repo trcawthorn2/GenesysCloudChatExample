@@ -992,34 +992,12 @@ define('chatExample/components/groups-overview/component', ['exports'], function
         groupService: Ember.inject.service(),
         searchService: Ember.inject.service(),
 
-        sortResults(response) {
-            let results = response.results;
-
-            let sortedResults = [];
-
-            this.group.forEach(group => {
-                let filteredResults = results.filter(result => result.chatRoomName === group.name);
-
-                let helloThere = {
-                    name: group.name,
-                    results: filteredResults
-                };
-
-                sortedResults.push(helloThere);
-            });
-
-            this.set('sortedResults', sortedResults);
-        },
-
         actions: {
             searchRepo(searchValue) {
-                // console.log(searchValue);
-                // console.log(this.model);
                 if (searchValue && searchValue.length > 1) {
-                    return this.model.filter(group => {
-                        const name = group.name; //,listingName = name[selectedLocale] || name['en-us'];
-
-                        //this.set('currentPage', 1);
+                    let allGroups = this.model[1].options;
+                    return allGroups.filter(group => {
+                        const name = group.name;
                         return name && name.toLowerCase().includes(searchValue.toLowerCase());
                     });
                 } else {
@@ -1029,7 +1007,6 @@ define('chatExample/components/groups-overview/component', ['exports'], function
             searchChatRooms() {
                 if (this.group && this.term && this.group.length > 0) {
                     return this.get('searchService').searchChat(this.term, this.group).then(result => {
-                        this.sortResults(result);
                         this.set('resultsCount', result.total);
                         this.set('resultsContent', result.results);
                         return result;
@@ -2669,6 +2646,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+817775f6"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+f6c1072c"});
 }
 //# sourceMappingURL=chatExample.map
