@@ -30,10 +30,15 @@
 
   {{#each sortedResults as |chatRoom|}}
     {{chatRoom.name}}
-    {{#each chatRoom.results as |result|}}    
-        <li>{{result.from.name}}: {{result.body}} ({{convert-timestamp result.created}})</li>
-        <hr />
-    {{/each}}
+    <ul>
+      {{#each chatRoom.results as |result|}}    
+          <li>
+              <span class="result-header">{{result.from.name}} | {{convert-timestamp result.created}}</span>
+              <div class="result-body">{{result.body}}</div>
+          </li>
+      {{/each}}
+    </ul>
+    <hr />
   {{/each}}
   </div>
 
