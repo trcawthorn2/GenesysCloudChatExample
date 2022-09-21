@@ -22,23 +22,25 @@
 
   <div class="resultCountContainer">
     {{#each sortedResults as |chatRoom|}}
-      <span class="resultCountBubble">{{chatRoom.name}}: {{chatRoom.results.length}}</span>
+      <a class="resultCountBubble" href="#{{chatRoom.jid}}">{{chatRoom.name}}: {{chatRoom.results.length}}</a>
     {{/each}}
   </div>
 
   <br />
 
   {{#each sortedResults as |chatRoom|}}
-    {{chatRoom.name}}
-    <ul>
-      {{#each chatRoom.results as |result|}}    
-          <li>
-              <span class="result-header">{{result.from.name}} | {{convert-timestamp result.created}}</span>
-              <div class="result-body">{{result.body}}</div>
-          </li>
-      {{/each}}
-    </ul>
-    <hr />
+    {{#if chatRoom.results.length}}
+      <span id="{{chatRoom.jid}}">{{chatRoom.name}}</span>
+      <ul>
+        {{#each chatRoom.results as |result|}}    
+            <li>
+                <span class="result-header">{{result.from.name}} | {{convert-timestamp result.created}}</span>
+                <div class="result-body">{{result.body}}</div>
+            </li>
+        {{/each}}
+      </ul>
+      <hr />
+    {{/if}}
   {{/each}}
   </div>
 

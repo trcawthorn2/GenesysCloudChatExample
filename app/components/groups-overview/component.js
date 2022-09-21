@@ -16,6 +16,7 @@ export default Component.extend({
 
             let helloThere = {
                 name: group.name,
+                jid: group.chat.jabberId,
                 results: filteredResults
             }
 
