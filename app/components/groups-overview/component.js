@@ -12,16 +12,21 @@ export default Component.extend({
         let sortedResults = [];
 
         this.group.forEach(group => {
-            let filteredResults = results.filter(result => result.chatRoomName === group.name);
+            let filteredResults = results.filter(result => result.chatRoomName === group.name).sort((a, b) => {return b.created - a.created});
+
+            let mostRecentTimestamp = filteredResults.length > 0 ? filteredResults[0].created : null;
 
             let helloThere = {
                 name: group.name,
                 jid: group.chat.jabberId,
-                results: filteredResults
+                results: filteredResults,
+                mostRecentTimestamp: mostRecentTimestamp
             }
 
             sortedResults.push(helloThere);
         });
+
+        sortedResults = sortedResults.sort((a, b) => {return b.mostRecentTimestamp - a.mostRecentTimestamp});
 
         this.set('sortedResults', sortedResults);
     },
