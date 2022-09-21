@@ -7009,6 +7009,16 @@ button.close {
   padding: 0 16px 0 0;
   width: 60%;
 }
+.__groups-overview__6359f .groups-overview .resultCountContainer {
+  padding-bottom: 10px;
+}
+.__groups-overview__6359f .groups-overview .resultCountContainer .resultCountBubble {
+  background-color: #e4e4e4;
+  padding: 4px;
+  border-radius: 4px;
+  margin-right: 5px;
+  border: 1px solid gray;
+}
 .groups-overview {
   padding: 10px;
 }
@@ -7018,6 +7028,16 @@ button.close {
 .groups-overview .ember-power-select-trigger {
   padding: 0 16px 0 0;
   width: 60%;
+}
+.groups-overview .resultCountContainer {
+  padding-bottom: 10px;
+}
+.groups-overview .resultCountContainer .resultCountBubble {
+  background-color: #e4e4e4;
+  padding: 4px;
+  border-radius: 4px;
+  margin-right: 5px;
+  border: 1px solid gray;
 }
 body {
   margin: 20px;

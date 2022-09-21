@@ -992,12 +992,34 @@ define('chatExample/components/groups-overview/component', ['exports'], function
         groupService: Ember.inject.service(),
         searchService: Ember.inject.service(),
 
+        sortResults(response) {
+            let results = response.results;
+
+            let sortedResults = [];
+
+            this.group.forEach(group => {
+                let filteredResults = results.filter(result => result.chatRoomName === group.name);
+
+                let helloThere = {
+                    name: group.name,
+                    results: filteredResults
+                };
+
+                sortedResults.push(helloThere);
+            });
+
+            this.set('sortedResults', sortedResults);
+        },
+
         actions: {
             searchRepo(searchValue) {
+                // console.log(searchValue);
+                // console.log(this.model);
                 if (searchValue && searchValue.length > 1) {
-                    let allGroups = this.model[1].options;
-                    return allGroups.filter(group => {
-                        const name = group.name;
+                    return this.model.filter(group => {
+                        const name = group.name; //,listingName = name[selectedLocale] || name['en-us'];
+
+                        //this.set('currentPage', 1);
                         return name && name.toLowerCase().includes(searchValue.toLowerCase());
                     });
                 } else {
@@ -1007,6 +1029,7 @@ define('chatExample/components/groups-overview/component', ['exports'], function
             searchChatRooms() {
                 if (this.group && this.term && this.group.length > 0) {
                     return this.get('searchService').searchChat(this.term, this.group).then(result => {
+                        this.sortResults(result);
                         this.set('resultsCount', result.total);
                         this.set('resultsContent', result.results);
                         return result;
@@ -1027,7 +1050,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "IlGwWH3i", "block": "{\"symbols\":[\"result\",\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"groups-container\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations to Search\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,2,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[8],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"search-container\"],[7],[0,\"\\n  \"],[1,[25,\"input\",null,[[\"value\",\"keyPress\",\"placeholder\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null],\"Type search term\"]]],false],[0,\"\\n  \"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"results-container\"],[7],[0,\"\\n  \"],[6,\"h4\"],[7],[0,\"Results Found: \"],[1,[18,\"resultsCount\"],false],[8],[0,\"\\n\\n\"],[4,\"each\",[[20,[\"resultsContent\"]]],null,{\"statements\":[[0,\"      \"],[1,[19,1,[\"chatRoomName\"]],false],[0,\"\\n      \"],[6,\"li\"],[7],[1,[19,1,[\"from\",\"name\"]],false],[0,\": \"],[1,[19,1,[\"body\"]],false],[0,\" (\"],[1,[25,\"convert-timestamp\",[[19,1,[\"created\"]]],null],false],[0,\")\"],[8],[0,\"\\n      \"],[6,\"hr\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "BBoWaZOW", "block": "{\"symbols\":[\"result\",\"chatRoomName\",\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"groups-container\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations to Search\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,3,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[8],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"search-container\"],[7],[0,\"\\n  \"],[1,[25,\"input\",null,[[\"value\",\"keyPress\",\"placeholder\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null],\"Type search term\"]]],false],[0,\"\\n  \"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"results-container\"],[7],[0,\"\\n  \"],[6,\"h4\"],[7],[0,\"Results Found: \"],[1,[18,\"resultsCount\"],false],[8],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"resultCountContainer\"],[7],[0,\"\\n\"],[4,\"each\",[[20,[\"sortedResults\"]]],null,{\"statements\":[[0,\"      \"],[6,\"span\"],[9,\"class\",\"resultCountBubble\"],[7],[1,[19,2,[\"name\"]],false],[0,\": \"],[1,[19,2,[\"results\",\"length\"]],false],[8],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"  \"],[8],[0,\"\\n\\n  \"],[6,\"br\"],[7],[8],[0,\"\\n\\n\"],[4,\"each\",[[20,[\"resultsContent\"]]],null,{\"statements\":[[0,\"      \"],[1,[19,1,[\"chatRoomName\"]],false],[0,\"\\n      \"],[6,\"li\"],[7],[1,[19,1,[\"from\",\"name\"]],false],[0,\": \"],[1,[19,1,[\"body\"]],false],[0,\" (\"],[1,[25,\"convert-timestamp\",[[19,1,[\"created\"]]],null],false],[0,\")\"],[8],[0,\"\\n      \"],[6,\"hr\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -2646,6 +2669,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+f6c1072c"});
+  require("chatExample/app")["default"].create({"name":"chatExample","version":"0.0.0+817775f6"});
 }
 //# sourceMappingURL=chatExample.map
