@@ -33,7 +33,12 @@ export default Route.extend({
 
                 return response;
             }).catch((error) => {
-                return groups.entities;
+                return Ember.A([
+                    {
+                        groupName: "Official Groups",
+                        options: groups.entities
+                    }
+                ])
             });
         });
     }

@@ -29,7 +29,7 @@ export default Component.extend({
     actions: {
         searchRepo(searchValue) {
             if (searchValue && searchValue.length > 1) {
-                let allGroups = this.model[1].options;
+                let allGroups = this.model.find(x => x.groupName === 'Official Groups').options;
                 return allGroups.filter(group => {
                     const name = group.name;
                     return name && name.toLowerCase().includes(searchValue.toLowerCase());
