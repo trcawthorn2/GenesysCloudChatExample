@@ -7005,17 +7005,30 @@ button.close {
 .__groups-overview__6359f .groups-overview .search-container {
   padding-top: 10px;
 }
+.__groups-overview__6359f .groups-overview .ember-power-select-trigger {
+  padding: 0 16px 0 0;
+  width: 60%;
+}
 .groups-overview {
   padding: 10px;
 }
 .groups-overview .search-container {
   padding-top: 10px;
 }
+.groups-overview .ember-power-select-trigger {
+  padding: 0 16px 0 0;
+  width: 60%;
+}
 body {
   margin: 20px;
   background: #fdfdfd;
   height: 100vh;
   overflow: hidden;
+  padding: 10px;
+  font-family: sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  color: #999;
 }
 body .main {
   height: 100%;
