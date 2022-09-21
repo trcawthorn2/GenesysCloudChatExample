@@ -20,6 +20,8 @@ export default Route.extend({
                     }
                 });
 
+                this.get('groupService').set('favoriteGroups', favoriteGroups);
+
                 const response = Ember.A([
                     {
                         groupName: "Favorites", options: favoriteGroups

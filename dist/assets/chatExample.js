@@ -1029,7 +1029,7 @@ define("chatExample/components/groups-overview/template", ["exports"], function 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "GSljWgYT", "block": "{\"symbols\":[\"result\",\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"groups-container\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations to Search\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,2,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[8],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"search-container\"],[7],[0,\"\\n  \"],[1,[25,\"input\",null,[[\"value\",\"keyPress\",\"placeholder\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null],\"Type search term\"]]],false],[0,\"\\n  \"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"results-container\"],[7],[0,\"\\n  \"],[6,\"h4\"],[7],[0,\"Results Found: \"],[1,[18,\"resultsCount\"],false],[8],[0,\"\\n\\n\"],[4,\"each\",[[20,[\"resultsContent\"]]],null,{\"statements\":[[0,\"      \"],[6,\"li\"],[7],[1,[19,1,[\"from\",\"name\"]],false],[0,\": \"],[1,[19,1,[\"body\"]],false],[0,\" (\"],[1,[25,\"convert-timestamp\",[[19,1,[\"created\"]]],null],false],[0,\")\"],[8],[0,\"\\n      \"],[6,\"hr\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "IlGwWH3i", "block": "{\"symbols\":[\"result\",\"group\"],\"statements\":[[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"groups-container\"],[7],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"search\",\"options\",\"placeholder\",\"selected\",\"onchange\"],[[25,\"action\",[[19,0,[]],\"searchRepo\"],null],[20,[\"model\"]],\"Select conversations to Search\",[20,[\"group\"]],[25,\"action\",[[19,0,[]],[25,\"mut\",[[20,[\"group\"]]],null]],null]]],{\"statements\":[[0,\"    \"],[1,[19,2,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[8],[0,\"\\n\"],[6,\"div\"],[9,\"class\",\"search-container\"],[7],[0,\"\\n  \"],[1,[25,\"input\",null,[[\"value\",\"keyPress\",\"placeholder\"],[[20,[\"term\"]],[25,\"action\",[[19,0,[]],\"onKeyPress\"],null],\"Type search term\"]]],false],[0,\"\\n  \"],[6,\"button\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"searchChatRooms\"],null],null],[7],[0,\"Search\"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"results-container\"],[7],[0,\"\\n  \"],[6,\"h4\"],[7],[0,\"Results Found: \"],[1,[18,\"resultsCount\"],false],[8],[0,\"\\n\\n\"],[4,\"each\",[[20,[\"resultsContent\"]]],null,{\"statements\":[[0,\"      \"],[1,[19,1,[\"chatRoomName\"]],false],[0,\"\\n      \"],[6,\"li\"],[7],[1,[19,1,[\"from\",\"name\"]],false],[0,\": \"],[1,[19,1,[\"body\"]],false],[0,\" (\"],[1,[25,\"convert-timestamp\",[[19,1,[\"created\"]]],null],false],[0,\")\"],[8],[0,\"\\n      \"],[6,\"hr\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "chatExample/components/groups-overview/template.hbs" } });
 });
 define('chatExample/components/link-to-cell/component', ['exports'], function (exports) {
     'use strict';
@@ -2075,6 +2075,8 @@ define('chatExample/routes/index', ['exports'], function (exports) {
                         }
                     });
 
+                    this.get('groupService').set('favoriteGroups', favoriteGroups);
+
                     const response = Ember.A([{
                         groupName: "Favorites", options: favoriteGroups
                     }, {
@@ -2281,6 +2283,8 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
         urlStateService: Ember.inject.service(),
         restClientService: Ember.inject.service(),
         regionLocatorService: Ember.inject.service(),
+        allGroups: [],
+        favoriteGroups: [],
 
         getFavorites: function () {
             if (this.get('authService').authToken) {
@@ -2299,7 +2303,10 @@ define('chatExample/services/group-service', ['exports'], function (exports) {
                 let state = this.get('urlStateService').cachedState();
                 let urlParams = new URLSearchParams(state);
                 let url = this.get('regionLocatorService').getRegionApiUrl(urlParams.get('region'));
-                return this.get('restClientService').get(url + '/api/v2/groups?pageSize=500', { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } });
+                return this.get('restClientService').get(url + '/api/v2/groups?pageSize=500', { headers: { 'Content-Type': 'application/json', 'Authorization': 'bearer ' + this.get('authService').authToken } }).then(results => {
+                    this.allGroups = results.entities;
+                    return results;
+                });
             }
         },
 
@@ -2470,6 +2477,8 @@ define('chatExample/services/search-service', ['exports'], function (exports) {
         urlStateService: Ember.inject.service(),
         restClientService: Ember.inject.service(),
         regionLocatorService: Ember.inject.service(),
+        groupService: Ember.inject.service(),
+
         getBaseUrl: function () {
             let state = this.get('urlStateService').cachedState();
             let urlParams = new URLSearchParams(state);
@@ -2507,7 +2516,29 @@ define('chatExample/services/search-service', ['exports'], function (exports) {
                     values: jabberIds
                 }]
             };
-            return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken));
+            return restClient.post(url, data, restClient.getOptions(this.get('authService').authToken)).then(response => {
+                let results = response.results;
+
+                let groupService = this.get('groupService');
+
+                results.forEach(x => {
+                    let jid = x.to.jid;
+
+                    let group = groupService.favoriteGroups.find(y => {
+                        return y.chat.jabberId.startsWith(jid);
+                    });
+                    if (!group) {
+                        group = groupService.allGroups.find(y => {
+                            return y.chat.jabberId.startsWith(jid);
+                        });
+                    }
+                    if (group) {
+                        x.chatRoomName = group.name;
+                    }
+                });
+
+                return response;
+            });
         }
     });
 });
